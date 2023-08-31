@@ -1,0 +1,1767 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.20.4.51522",
+      "templateHash": "12115383057351227492"
+    }
+  },
+  "parameters": {
+    "containerName": {
+      "type": "string"
+    },
+    "deploymentNameSuffix": {
+      "type": "string",
+      "defaultValue": "[utcNow()]"
+    },
+    "excludeFromLatest": {
+      "type": "bool"
+    },
+    "galleryName": {
+      "type": "string"
+    },
+    "galleryResourceGroup": {
+      "type": "string"
+    },
+    "guidValue": {
+      "type": "string",
+      "defaultValue": "[newGuid()]"
+    },
+    "imageName": {
+      "type": "string"
+    },
+    "imageVersion": {
+      "type": "string"
+    },
+    "imageVmRg": {
+      "type": "string"
+    },
+    "installAccess": {
+      "type": "bool"
+    },
+    "installExcel": {
+      "type": "bool"
+    },
+    "installFsLogix": {
+      "type": "bool"
+    },
+    "installOneDriveForBusiness": {
+      "type": "bool"
+    },
+    "installOneNote": {
+      "type": "bool"
+    },
+    "installOutlook": {
+      "type": "bool"
+    },
+    "installPowerPoint": {
+      "type": "bool"
+    },
+    "installProject": {
+      "type": "bool"
+    },
+    "installPublisher": {
+      "type": "bool"
+    },
+    "installSkypeForBusiness": {
+      "type": "bool"
+    },
+    "installTeams": {
+      "type": "bool"
+    },
+    "installVirtualDesktopOptimizationTool": {
+      "type": "bool"
+    },
+    "installVisio": {
+      "type": "bool"
+    },
+    "installWord": {
+      "type": "bool"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[deployment().location]"
+    },
+    "managementVmRg": {
+      "type": "string"
+    },
+    "miName": {
+      "type": "string"
+    },
+    "miResourceGroup": {
+      "type": "string"
+    },
+    "offer": {
+      "type": "string"
+    },
+    "OsVersion": {
+      "type": "string"
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "replicaCount": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "saResourceGroup": {
+      "type": "string"
+    },
+    "sku": {
+      "type": "string"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "subnetName": {
+      "type": "string"
+    },
+    "TenantType": {
+      "type": "string",
+      "allowedValues": [
+        "Commercial",
+        "DepartmentOfDefense",
+        "GovernmentCommunityCloud",
+        "GovernmentCommunityCloudHigh"
+      ]
+    },
+    "virtualNetworkName": {
+      "type": "string"
+    },
+    "virtualNetworkResourceGroup": {
+      "type": "string"
+    },
+    "vmSize": {
+      "type": "string"
+    },
+    "customizations": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "vDotInstaller": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "cloud": "[environment().name]",
+    "adminPw": "[format('{0}-{1}', toUpper(uniqueString(subscription().id)), parameters('guidValue'))]",
+    "adminUsername": "xadmin",
+    "subscriptionId": "[subscription().subscriptionId]",
+    "securityType": "TrustedLaunch",
+    "imageVmName": "vm-image",
+    "managementVmName": "vm-management"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('image-vm-{0}', parameters('deploymentNameSuffix'))]",
+      "subscriptionId": "[variables('subscriptionId')]",
+      "resourceGroup": "[parameters('imageVmRg')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "adminPassword": {
+            "value": "[variables('adminPw')]"
+          },
+          "adminUsername": {
+            "value": "[variables('adminUsername')]"
+          },
+          "miName": {
+            "value": "[parameters('miName')]"
+          },
+          "miResourceGroup": {
+            "value": "[parameters('miResourceGroup')]"
+          },
+          "OSVersion": {
+            "value": "[parameters('OsVersion')]"
+          },
+          "securityType": {
+            "value": "[variables('securityType')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "virtualResourceGroup": {
+            "value": "[split(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('virtualNetworkResourceGroup')), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/')[4]]"
+          },
+          "vmName": {
+            "value": "[variables('imageVmName')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "offer": {
+            "value": "[parameters('offer')]"
+          },
+          "publisher": {
+            "value": "[parameters('publisher')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.20.4.51522",
+              "templateHash": "5409850735053889594"
+            }
+          },
+          "parameters": {
+            "adminUsername": {
+              "type": "string",
+              "metadata": {
+                "description": "Username for the Virtual Machine."
+              }
+            },
+            "adminPassword": {
+              "type": "securestring",
+              "metadata": {
+                "description": "Password for the Virtual Machine."
+              }
+            },
+            "OSVersion": {
+              "type": "string",
+              "metadata": {
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+              }
+            },
+            "vmSize": {
+              "type": "string",
+              "metadata": {
+                "description": "Size of the virtual machine."
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "vmName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "publisher": {
+              "type": "string"
+            },
+            "offer": {
+              "type": "string"
+            },
+            "securityType": {
+              "type": "string",
+              "allowedValues": [
+                "Standard",
+                "TrustedLaunch"
+              ],
+              "metadata": {
+                "description": "Security Type of the Virtual Machine."
+              }
+            },
+            "miName": {
+              "type": "string"
+            },
+            "miResourceGroup": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "virtualResourceGroup": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "virtualNetworkName": {
+              "type": "string"
+            },
+            "subnetName": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "nicName": "[format('{0}-nic', parameters('vmName'))]",
+            "networkSecurityGroupName": "nsg-image-vm",
+            "securityProfileJson": {
+              "uefiSettings": {
+                "secureBootEnabled": true,
+                "vTpmEnabled": true
+              },
+              "securityType": "[parameters('securityType')]"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2022-05-01",
+              "name": "[variables('networkSecurityGroupName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "default-allow-3389",
+                    "properties": {
+                      "priority": 1000,
+                      "access": "Allow",
+                      "direction": "Inbound",
+                      "destinationPortRange": "3389",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2022-05-01",
+              "name": "[variables('nicName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "subnet": {
+                        "id": "[format('{0}/subnets/{1}', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('virtualResourceGroup')), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('subnetName'))]"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2022-03-01",
+              "name": "[parameters('vmName')]",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('miResourceGroup')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('miName')))]": {}
+                }
+              },
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "[parameters('publisher')]",
+                    "offer": "[parameters('offer')]",
+                    "sku": "[parameters('OSVersion')]",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "deleteOption": "Delete",
+                    "managedDisk": {
+                      "storageAccountType": "StandardSSD_LRS"
+                    }
+                  },
+                  "dataDisks": []
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
+                      "properties": {
+                        "deleteOption": "Delete"
+                      }
+                    }
+                  ]
+                },
+                "diagnosticsProfile": {
+                  "bootDiagnostics": {
+                    "enabled": false
+                  }
+                },
+                "securityProfile": "[if(equals(parameters('securityType'), 'TrustedLaunch'), variables('securityProfileJson'), null())]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "imageVm": {
+              "type": "string",
+              "value": "[parameters('vmName')]"
+            },
+            "imageId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+            },
+            "imageRg": {
+              "type": "string",
+              "value": "[split(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '/')[4]]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('custom-vm-{0}', parameters('deploymentNameSuffix'))]",
+      "subscriptionId": "[variables('subscriptionId')]",
+      "resourceGroup": "[parameters('imageVmRg')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "containerName": {
+            "value": "[parameters('containerName')]"
+          },
+          "customizations": {
+            "value": "[parameters('customizations')]"
+          },
+          "installAccess": {
+            "value": "[parameters('installAccess')]"
+          },
+          "installExcel": {
+            "value": "[parameters('installExcel')]"
+          },
+          "installFsLogix": {
+            "value": "[parameters('installFsLogix')]"
+          },
+          "installOneDriveForBusiness": {
+            "value": "[parameters('installOneDriveForBusiness')]"
+          },
+          "installOneNote": {
+            "value": "[parameters('installOneNote')]"
+          },
+          "installOutlook": {
+            "value": "[parameters('installOutlook')]"
+          },
+          "installPowerPoint": {
+            "value": "[parameters('installPowerPoint')]"
+          },
+          "installProject": {
+            "value": "[parameters('installProject')]"
+          },
+          "installPublisher": {
+            "value": "[parameters('installPublisher')]"
+          },
+          "installSkypeForBusiness": {
+            "value": "[parameters('installSkypeForBusiness')]"
+          },
+          "installTeams": {
+            "value": "[parameters('installTeams')]"
+          },
+          "installVirtualDesktopOptimizationTool": {
+            "value": "[parameters('installVirtualDesktopOptimizationTool')]"
+          },
+          "installVisio": {
+            "value": "[parameters('installVisio')]"
+          },
+          "installWord": {
+            "value": "[parameters('installWord')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('storageAccountName')]"
+          },
+          "storageEndpoint": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('saResourceGroup')), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').primaryEndpoints.blob]"
+          },
+          "TenantType": {
+            "value": "[parameters('TenantType')]"
+          },
+          "userAssignedIdentityObjectId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('miResourceGroup')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('miName')), '2023-01-31').principalId]"
+          },
+          "vmName": {
+            "value": "[variables('imageVmName')]"
+          },
+          "vDotInstaller": {
+            "value": "[parameters('vDotInstaller')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.20.4.51522",
+              "templateHash": "3960636069787750192"
+            }
+          },
+          "parameters": {
+            "containerName": {
+              "type": "string"
+            },
+            "installAccess": {
+              "type": "bool"
+            },
+            "installExcel": {
+              "type": "bool"
+            },
+            "installFsLogix": {
+              "type": "bool"
+            },
+            "installOneDriveForBusiness": {
+              "type": "bool"
+            },
+            "installOneNote": {
+              "type": "bool"
+            },
+            "installOutlook": {
+              "type": "bool"
+            },
+            "installPowerPoint": {
+              "type": "bool"
+            },
+            "installProject": {
+              "type": "bool"
+            },
+            "installPublisher": {
+              "type": "bool"
+            },
+            "installSkypeForBusiness": {
+              "type": "bool"
+            },
+            "installTeams": {
+              "type": "bool"
+            },
+            "installVirtualDesktopOptimizationTool": {
+              "type": "bool"
+            },
+            "installVisio": {
+              "type": "bool"
+            },
+            "installWord": {
+              "type": "bool"
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageEndpoint": {
+              "type": "string"
+            },
+            "vmName": {
+              "type": "string"
+            },
+            "TenantType": {
+              "type": "string",
+              "allowedValues": [
+                "Commercial",
+                "DepartmentOfDefense",
+                "GovernmentCommunityCloud",
+                "GovernmentCommunityCloudHigh"
+              ]
+            },
+            "userAssignedIdentityObjectId": {
+              "type": "string"
+            },
+            "customizations": {
+              "type": "array"
+            },
+            "vDotInstaller": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "installAccessVar": "[format('{0}installAccess', parameters('installAccess'))]",
+            "installExcelVar": "[format('{0}installWord', parameters('installExcel'))]",
+            "installOneDriveForBusinessVar": "[format('{0}installOneDrive', parameters('installOneDriveForBusiness'))]",
+            "installOneNoteVar": "[format('{0}installOneNote', parameters('installOneNote'))]",
+            "installOutlookVar": "[format('{0}installOutlook', parameters('installOutlook'))]",
+            "installPowerPointVar": "[format('{0}installPowerPoint', parameters('installPowerPoint'))]",
+            "installProjectVar": "[format('{0}installProject', parameters('installProject'))]",
+            "installPublisherVar": "[format('{0}installPublisher', parameters('installPublisher'))]",
+            "installSkypeForBusinessVar": "[format('{0}installSkypeForBusiness', parameters('installSkypeForBusiness'))]",
+            "installVisioVar": "[format('{0}installVisio', parameters('installVisio'))]",
+            "installWordVar": "[format('{0}installWord', parameters('installWord'))]",
+            "installers": "[parameters('customizations')]"
+          },
+          "resources": [
+            {
+              "copy": {
+                "name": "applications",
+                "count": "[length(variables('installers'))]"
+              },
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), format('app-{0}', variables('installers')[copyIndex()].name))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "treatFailureAsDeploymentFailure": true,
+                "parameters": [
+                  {
+                    "name": "UserAssignedIdentityObjectId",
+                    "value": "[parameters('userAssignedIdentityObjectId')]"
+                  },
+                  {
+                    "name": "StorageAccountName",
+                    "value": "[parameters('storageAccountName')]"
+                  },
+                  {
+                    "name": "ContainerName",
+                    "value": "[parameters('containerName')]"
+                  },
+                  {
+                    "name": "StorageEndpoint",
+                    "value": "[parameters('storageEndpoint')]"
+                  },
+                  {
+                    "name": "Blobname",
+                    "value": "[variables('installers')[copyIndex()].blobName]"
+                  },
+                  {
+                    "name": "Arguments",
+                    "value": "[variables('installers')[copyIndex()].arguments]"
+                  }
+                ],
+                "source": {
+                  "script": "      param(\r\n        [string]$UserAssignedIdentityObjectId,\r\n        [string]$StorageAccountName,\r\n        [string]$ContainerName,\r\n        [string]$StorageEndpoint,\r\n        [string]$BlobName,\r\n        [string]$Arguments\r\n        )\r\n        $UserAssignedIdentityObjectId = $UserAssignedIdentityObjectId\r\n        $StorageAccountName = $StorageAccountName\r\n        $ContainerName = $ContainerName\r\n        $BlobName = $BlobName\r\n        $StorageAccountUrl = $StorageEndpoint\r\n        $TokenUri = \"http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=$StorageAccountUrl&object_id=$UserAssignedIdentityObjectId\"\r\n        $AccessToken = ((Invoke-WebRequest -Headers @{Metadata=$true} -Uri $TokenUri -UseBasicParsing).Content | ConvertFrom-Json).access_token\r\n        Invoke-WebRequest -Headers @{\"x-ms-version\"=\"2017-11-09\"; Authorization =\"Bearer $AccessToken\"} -Uri \"$StorageAccountUrl$ContainerName/$BlobName\" -OutFile $env:windir\\temp\\$BlobName\r\n        Start-Sleep -Seconds 30\r\n        Set-Location -Path $env:windir\\temp\r\n        if($Blobname -like (\"*.exe\"))\r\n        {\r\n          Start-Process -FilePath $env:windir\\temp\\$BlobName -ArgumentList $Arguments -NoNewWindow -Wait -PassThru\r\n        }\r\n        if($Blobname -like (\"*.msi\"))\r\n        {\r\n          Start-Process -FilePath msiexec.exe -ArgumentList $Arguments -Wait\r\n        }\r\n        if($Blobname -like (\"*.bat\"))\r\n        {\r\n          Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait\r\n        }\r\n        if($Blobname -like (\"*.zip\"))\r\n        {\r\n          Expand-Archive -Path $env:windir\\temp\\$BlobName -DestinationPath $env:windir\\temp\\\r\n          # Update line 119 to meet requirements of installer(s)\r\n          # Start-Process -FilePath $env:windir\\temp\\$BlobName -ArgumentList $Arguments -NoNewWindow -Wait -PassThru\r\n        }\r\n      "
+                }
+              }
+            },
+            {
+              "condition": "[or(or(or(or(or(or(or(or(or(or(parameters('installAccess'), parameters('installExcel')), parameters('installOneDriveForBusiness')), parameters('installOneNote')), parameters('installOutlook')), parameters('installPowerPoint')), parameters('installPublisher')), parameters('installSkypeForBusiness')), parameters('installWord')), parameters('installVisio')), parameters('installProject'))]",
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2022-11-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'office')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "parameters": [
+                  {
+                    "name": "InstallAccess",
+                    "value": "[variables('installAccessVar')]"
+                  },
+                  {
+                    "name": "InstallWord",
+                    "value": "[variables('installWordVar')]"
+                  },
+                  {
+                    "name": "InstallExcel",
+                    "value": "[variables('installExcelVar')]"
+                  },
+                  {
+                    "name": "InstallOneDriveForBusiness",
+                    "value": "[variables('installOneDriveForBusinessVar')]"
+                  },
+                  {
+                    "name": "InstallOneNote",
+                    "value": "[variables('installOneNoteVar')]"
+                  },
+                  {
+                    "name": "InstallOutlook",
+                    "value": "[variables('installOutlookVar')]"
+                  },
+                  {
+                    "name": "InstallPowerPoint",
+                    "value": "[variables('installPowerPointVar')]"
+                  },
+                  {
+                    "name": "InstallProject",
+                    "value": "[variables('installProjectVar')]"
+                  },
+                  {
+                    "name": "InstallPublisher",
+                    "value": "[variables('installPublisherVar')]"
+                  },
+                  {
+                    "name": "InstallSkypeForBusiness",
+                    "value": "[variables('installSkypeForBusinessVar')]"
+                  },
+                  {
+                    "name": "InstallVisio",
+                    "value": "[variables('installVisioVar')]"
+                  }
+                ],
+                "source": {
+                  "script": "      param(\r\n      [string]$InstallAccess,\r\n      [string]$InstallExcel,\r\n      [string]$InstallOneDriveForBusiness,\r\n      [string]$InstallOutlook,\r\n      [string]$InstallProject,\r\n      [string]$InstallPublisher,\r\n      [string]$InstallSkypeForBusiness,\r\n      [string]$InstallVisio,\r\n      [string]$InstallWord,\r\n      [string]$InstallOneNote,\r\n      [string]$InstallPowerPoint\r\n      )\r\n      $sku = (Get-ComputerInfo).OsName\r\n      $o365ConfigHeader = Set-Content \"$env:windir\\temp\\office365x64.xml\" '<Configuration><Add OfficeClientEdition=\"64\" Channel=\"Current\">'\r\n      $o365OfficeHeader = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<Product ID=\"O365ProPlusRetail\"><Language ID=\"en-us\" /><ExcludeApp ID=\"Teams\"/>'\r\n      if($InstallAccess -notlike '*true*'){\r\n          $excludeAccess = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"Access\" />'\r\n      }\r\n      if($InstallExcel -notlike '*true*'){\r\n          $excludeExcel = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"Excel\" />'\r\n      }\r\n      if($InstallOneDriveForBusiness -notlike '*true*'){\r\n          $excludeOneDriveForBusiness = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"Groove\" />'\r\n      }\r\n      if($InstallOneNote -notlike '*true*'){\r\n          $excludeOneNote = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"OneNote\" />'\r\n      }\r\n      if($InstallOutlook -notlike '*true*'){\r\n          $excludeOutlook = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"Outlook\" />'\r\n      }\r\n      if($InstallPowerPoint -notlike '*true*'){\r\n          $excludePowerPoint = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"PowerPoint\" />'\r\n      }\r\n      if($InstallPublisher -notlike '*true*'){\r\n          $excludePublisher = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"Publisher\" />'\r\n      }\r\n      if($InstallSkypeForBusiness -notlike '*true*'){\r\n          $excludeSkypeForBusiness= Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"Lync\" />'\r\n      }\r\n      if($InstallWord -notlike '*true*'){\r\n          $excludeSkypeForBusiness= Add-Content \"$env:windir\\temp\\office365x64.xml\" '<ExcludeApp ID=\"Word\" />'\r\n      }\r\n      $addOfficefooter = Add-Content \"$env:windir\\temp\\office365x64.xml\" '</Product>'\r\n      if($InstallProject -like '*true*'){\r\n        Add-Content \"$env:windir\\temp\\office365x64.xml\" '<Product ID=\"ProjectProRetail\"><Language ID=\"en-us\" /></Product>'\r\n      }\r\n      if($InstallVisio -like '*true*'){\r\n        Add-Content \"$env:windir\\temp\\office365x64.xml\" '<Product ID=\"VisioProRetail\"><Language ID=\"en-us\" /></Product>'\r\n      }\r\n      $o365Settings = Add-Content \"$env:windir\\temp\\office365x64.xml\" '</Add><Updates Enabled=\"FALSE\" /><Display Level=\"None\" AcceptEULA=\"TRUE\" /><Property Name=\"FORCEAPPSHUTDOWN\" Value=\"TRUE\"/>'\r\n      $PerMachineConfiguration = if(($Sku).Contains(\"multi\") -eq \"true\"){\r\n          $o365SharedActivation = Add-Content \"$env:windir\\temp\\office365x64.xml\" '<Property Name=\"SharedComputerLicensing\" Value=\"1\"/>'\r\n      }\r\n      $o365Configfooter = Add-Content \"$env:windir\\temp\\office365x64.xml\" '</Configuration>'\r\n      $ErrorActionPreference = \"Stop\"\r\n      $Installer = \"$env:windir\\temp\\office.exe\"\r\n      $DownloadLinks = Invoke-WebRequest -Uri \"https://www.microsoft.com/en-us/download/confirmation.aspx?id=49117\" -UseBasicParsing\r\n      $URL = $DownloadLinks.Links.href | Where-Object {$_ -like \"https://download.microsoft.com/download/*officedeploymenttool*\"} | Select-Object -First 1\r\n      Invoke-WebRequest -Uri $URL -OutFile $Installer -UseBasicParsing\r\n      Start-Process -FilePath $Installer -ArgumentList \"/extract:$env:windir\\temp /quiet /passive /norestart\" -Wait -PassThru | Out-Null\r\n      Write-Host \"Downloaded & extracted the Office 365 Deployment Toolkit\"\r\n      Start-Process -FilePath \"$env:windir\\temp\\setup.exe\" -ArgumentList \"/configure $env:windir\\temp\\office365x64.xml\" -Wait -PassThru -ErrorAction \"Stop\" | Out-Null\r\n      Write-Host \"Installed the selected Office365 applications\"\r\n      "
+                }
+              },
+              "dependsOn": [
+                "applications"
+              ]
+            },
+            {
+              "condition": "[parameters('installVirtualDesktopOptimizationTool')]",
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2022-11-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'vdot')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "parameters": [
+                  {
+                    "name": "UserAssignedIdentityObjectId",
+                    "value": "[parameters('userAssignedIdentityObjectId')]"
+                  },
+                  {
+                    "name": "StorageAccountName",
+                    "value": "[parameters('storageAccountName')]"
+                  },
+                  {
+                    "name": "ContainerName",
+                    "value": "[parameters('containerName')]"
+                  },
+                  {
+                    "name": "StorageEndpoint",
+                    "value": "[parameters('storageEndpoint')]"
+                  },
+                  {
+                    "name": "BlobName",
+                    "value": "[parameters('vDotInstaller')]"
+                  }
+                ],
+                "source": {
+                  "script": "      param(\r\n        [string]$UserAssignedIdentityObjectId,\r\n        [string]$StorageAccountName,\r\n        [string]$ContainerName,\r\n        [string]$StorageEndpoint,\r\n        [string]$BlobName\r\n        )\r\n        $UserAssignedIdentityObjectId = $UserAssignedIdentityObjectId\r\n        $StorageAccountName = $StorageAccountName\r\n        $ContainerName = $ContainerName\r\n        $BlobName = $BlobName\r\n        $StorageAccountUrl = $StorageEndpoint\r\n        $TokenUri = \"http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=$StorageAccountUrl&object_id=$UserAssignedIdentityObjectId\"\r\n        $AccessToken = ((Invoke-WebRequest -Headers @{Metadata=$true} -Uri $TokenUri -UseBasicParsing).Content | ConvertFrom-Json).access_token\r\n        $ZIP = \"$env:windir\\temp\\VDOT.zip\"\r\n        Invoke-WebRequest -Headers @{\"x-ms-version\"=\"2017-11-09\"; Authorization =\"Bearer $AccessToken\"} -Uri \"$StorageAccountUrl$ContainerName/$BlobName\" -OutFile $ZIP\r\n        Start-Sleep -Seconds 30\r\n        Set-Location -Path $env:windir\\temp\r\n        $ErrorActionPreference = \"Stop\"\r\n        Unblock-File -Path $ZIP\r\n        Expand-Archive -LiteralPath $ZIP -DestinationPath \"$env:windir\\temp\" -Force\r\n        $Path = (Get-ChildItem -Path \"$env:windir\\temp\" -Recurse | Where-Object {$_.Name -eq \"Windows_VDOT.ps1\"}).FullName\r\n        $Script = Get-Content -Path $Path\r\n        $ScriptUpdate = $Script.Replace(\"Set-NetAdapterAdvancedProperty\",\"#Set-NetAdapterAdvancedProperty\")\r\n        $ScriptUpdate | Set-Content -Path $Path\r\n        & $Path -Optimizations @(\"AppxPackages\",\"Autologgers\",\"DefaultUserSettings\",\"LGPO\";\"NetworkOptimizations\",\"ScheduledTasks\",\"Services\",\"WindowsMediaPlayer\") -AdvancedOptimizations \"All\" -AcceptEULA\r\n        Write-Host \"Optimized the operating system using the Virtual Desktop Optimization Tool\"\r\n      "
+                },
+                "timeoutInSeconds": 640
+              },
+              "dependsOn": [
+                "applications",
+                "[resourceId('Microsoft.Compute/virtualMachines/runCommands', parameters('vmName'), 'fslogix')]",
+                "[resourceId('Microsoft.Compute/virtualMachines/runCommands', parameters('vmName'), 'office')]",
+                "[resourceId('Microsoft.Compute/virtualMachines/runCommands', parameters('vmName'), 'teams')]"
+              ]
+            },
+            {
+              "condition": "[parameters('installFsLogix')]",
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2022-11-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'fslogix')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "source": {
+                  "script": "      $ErrorActionPreference = \"Stop\"\r\n      $ZIP = \"$env:windir\\temp\\fslogix.zip\"\r\n      Invoke-WebRequest -Uri \"https://aka.ms/fslogix_download\" -OutFile $ZIP\r\n      Unblock-File -Path $ZIP\r\n      Expand-Archive -LiteralPath $ZIP -DestinationPath \"$env:windir\\temp\\fslogix\" -Force\r\n      Write-Host \"Downloaded the latest version of FSLogix\"\r\n      $ErrorActionPreference = \"Stop\"\r\n      Start-Process -FilePath \"$env:windir\\temp\\fslogix\\x64\\Release\\FSLogixAppsSetup.exe\" -ArgumentList \"/install /quiet /norestart\" -Wait -PassThru | Out-Null\r\n      Write-Host \"Installed the latest version of FSLogix\"\r\n      "
+                },
+                "timeoutInSeconds": 640
+              },
+              "dependsOn": [
+                "applications",
+                "[resourceId('Microsoft.Compute/virtualMachines/runCommands', parameters('vmName'), 'office')]",
+                "[resourceId('Microsoft.Compute/virtualMachines/runCommands', parameters('vmName'), 'teams')]"
+              ]
+            },
+            {
+              "condition": "[parameters('installTeams')]",
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2022-11-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'teams')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "parameters": [
+                  {
+                    "name": "TenantType",
+                    "value": "[parameters('TenantType')]"
+                  }
+                ],
+                "source": {
+                  "script": "      param(\r\n        [string]$TenantType\r\n        )\r\n      If($TenantType -eq \"Commercial\")\r\n      {\r\n        $TeamsUrl = \"https://teams.microsoft.com/downloads/desktopurl?env=production&plat=windows&arch=x64&managedInstaller=true&download=true\"\r\n      }\r\n      If($TenantType -eq \"DepartmentOfDefense\")\r\n      {\r\n        $TeamsUrl = \"https://dod.teams.microsoft.us/downloads/desktopurl?env=production&plat=windows&arch=x64&managedInstaller=true&download=true\"\r\n      }\r\n      If($TenantType -eq \"GovernmentCommunityCloud\")\r\n      {\r\n        $TeamsUrl = \"https://teams.microsoft.com/downloads/desktopurl?env=production&plat=windows&arch=x64&managedInstaller=true&ring=general_gcc&download=true\"\r\n      }\r\n      If($TenantType -eq \"GovernmentCommunityCloudHigh\")\r\n      {\r\n        $TeamsUrl = \"https://gov.teams.microsoft.us/downloads/desktopurl?env=production&plat=windows&arch=x64&managedInstaller=true&download=true\"\r\n      }\r\n      Write-Host $($TeamsUrl)\r\n      # Enable media optimizations for Team\r\n      Start-Process \"reg\" -ArgumentList \"add HKLM\\SOFTWARE\\Microsoft\\Teams /v IsWVDEnvironment /t REG_DWORD /d 1 /f\" -Wait -PassThru -ErrorAction \"Stop\"\r\n      Write-Host \"Enabled media optimizations for Teams\"\r\n      # Download & install the latest version of Microsoft Visual C++ Redistributable\r\n      $ErrorActionPreference = \"Stop\"\r\n      $File = \"$env:windir\\temp\\vc_redist.x64.exe\"\r\n      Invoke-WebRequest -Uri \"https://aka.ms/vs/16/release/vc_redist.x64.exe\" -OutFile $File\r\n      Start-Process -FilePath $File -Args \"/install /quiet /norestart /log vcdist.log\" -Wait -PassThru | Out-Null\r\n      Write-Host \"Installed the latest version of Microsoft Visual C++ Redistributable\"\r\n      # Download & install the Remote Desktop WebRTC Redirector Service\r\n      $ErrorActionPreference = \"Stop\"\r\n      $File = \"$env:windir\\temp\\webSocketSvc.msi\"\r\n      Invoke-WebRequest -Uri \"https://aka.ms/msrdcwebrtcsvc/msi\" -OutFile $File\r\n      Start-Process -FilePath msiexec.exe -Args \"/i $File /quiet /qn /norestart /passive /log webSocket.log\" -Wait -PassThru | Out-Null\r\n      Write-Host \"Installed the Remote Desktop WebRTC Redirector Service\"\r\n      # Install Teams\r\n      $ErrorActionPreference = \"Stop\"\r\n      $File = \"$env:windir\\temp\\teams.msi\"\r\n      Write-host $($TeamsUrl)\r\n      Invoke-WebRequest -Uri \"$TeamsUrl\" -OutFile $File\r\n      $sku = (Get-ComputerInfo).OsName\r\n      $PerMachineConfiguration = if(($Sku).Contains(\"multi\") -eq \"true\"){\"ALLUSER=1\"}else{\"\"}\r\n      Start-Process -FilePath msiexec.exe -Args \"/i $File /quiet /qn /norestart /passive /log teams.log $PerMachineConfiguration ALLUSERS=1\" -Wait -PassThru | Out-Null\r\n      Write-Host \"Installed Teams\"\r\n      "
+                }
+              },
+              "dependsOn": [
+                "applications",
+                "[resourceId('Microsoft.Compute/virtualMachines/runCommands', parameters('vmName'), 'office')]"
+              ]
+            }
+          ],
+          "outputs": {
+            "TenantType": {
+              "type": "string",
+              "value": "[parameters('TenantType')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('management-vm-{0}', parameters('deploymentNameSuffix'))]",
+      "subscriptionId": "[variables('subscriptionId')]",
+      "resourceGroup": "[parameters('managementVmRg')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "adminPassword": {
+            "value": "[variables('adminPw')]"
+          },
+          "adminUsername": {
+            "value": "[variables('adminUsername')]"
+          },
+          "containerName": {
+            "value": "[parameters('containerName')]"
+          },
+          "miName": {
+            "value": "[parameters('miName')]"
+          },
+          "miResourceGroup": {
+            "value": "[parameters('miResourceGroup')]"
+          },
+          "securityType": {
+            "value": "[variables('securityType')]"
+          },
+          "storageEndpoint": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('saResourceGroup')), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').primaryEndpoints.blob]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "virtualNetworkResourceGroup": {
+            "value": "[split(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('virtualNetworkResourceGroup')), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/')[4]]"
+          },
+          "vmName": {
+            "value": "[variables('managementVmName')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.20.4.51522",
+              "templateHash": "17188749256623825597"
+            }
+          },
+          "parameters": {
+            "adminUsername": {
+              "type": "string",
+              "metadata": {
+                "description": "Username for the Virtual Machine."
+              }
+            },
+            "adminPassword": {
+              "type": "securestring",
+              "metadata": {
+                "description": "Password for the Virtual Machine."
+              }
+            },
+            "vmSize": {
+              "type": "string",
+              "metadata": {
+                "description": "Size of the virtual machine."
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "vmName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "securityType": {
+              "type": "string",
+              "allowedValues": [
+                "Standard",
+                "TrustedLaunch"
+              ],
+              "metadata": {
+                "description": "Security Type of the Virtual Machine."
+              }
+            },
+            "miName": {
+              "type": "string"
+            },
+            "miResourceGroup": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "virtualNetworkResourceGroup": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "virtualNetworkName": {
+              "type": "string"
+            },
+            "subnetName": {
+              "type": "string"
+            },
+            "containerName": {
+              "type": "string"
+            },
+            "storageEndpoint": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "installers": [
+              {
+                "name": "AzModules",
+                "blobName": "Az-Cmdlets-10.2.0.37547-x64.msi",
+                "arguments": "/i Az-Cmdlets-10.2.0.37547-x64.msi /qn /norestart",
+                "enabled": true
+              }
+            ],
+            "nicName": "[format('{0}-nic', parameters('vmName'))]",
+            "networkSecurityGroupName": "nsg-image-vm",
+            "securityProfileJson": {
+              "uefiSettings": {
+                "secureBootEnabled": true,
+                "vTpmEnabled": true
+              },
+              "securityType": "[parameters('securityType')]"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2022-05-01",
+              "name": "[variables('networkSecurityGroupName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "default-allow-3389",
+                    "properties": {
+                      "priority": 1000,
+                      "access": "Allow",
+                      "direction": "Inbound",
+                      "destinationPortRange": "3389",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2022-05-01",
+              "name": "[variables('nicName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "subnet": {
+                        "id": "[format('{0}/subnets/{1}', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('virtualNetworkResourceGroup')), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('subnetName'))]"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2022-03-01",
+              "name": "[parameters('vmName')]",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('miResourceGroup')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('miName')))]": {}
+                }
+              },
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "MicrosoftWindowsServer",
+                    "offer": "WindowsServer",
+                    "sku": "2019-datacenter-core-g2",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "deleteOption": "Delete",
+                    "managedDisk": {
+                      "storageAccountType": "StandardSSD_LRS"
+                    }
+                  },
+                  "dataDisks": []
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
+                      "properties": {
+                        "deleteOption": "Delete"
+                      }
+                    }
+                  ]
+                },
+                "diagnosticsProfile": {
+                  "bootDiagnostics": {
+                    "enabled": false
+                  }
+                },
+                "securityProfile": "[if(equals(parameters('securityType'), 'TrustedLaunch'), variables('securityProfileJson'), null())]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "modules",
+                "count": "[length(variables('installers'))]"
+              },
+              "condition": "[variables('installers')[copyIndex()].enabled]",
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2022-11-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), format('app{0}', variables('installers')[copyIndex()].name))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "parameters": [
+                  {
+                    "name": "UserAssignedIdentityObjectId",
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('miResourceGroup')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('miName')), '2023-01-31').principalId]"
+                  },
+                  {
+                    "name": "ContainerName",
+                    "value": "[parameters('containerName')]"
+                  },
+                  {
+                    "name": "StorageEndpoint",
+                    "value": "[parameters('storageEndpoint')]"
+                  },
+                  {
+                    "name": "BlobName",
+                    "value": "[variables('installers')[copyIndex()].blobName]"
+                  },
+                  {
+                    "name": "Arguments",
+                    "value": "[variables('installers')[copyIndex()].arguments]"
+                  }
+                ],
+                "source": {
+                  "script": "      param(\r\n        [string]$UserAssignedIdentityObjectId,\r\n        [string]$StorageAccountName,\r\n        [string]$ContainerName,\r\n        [string]$StorageEndpoint,\r\n        [string]$BlobName,\r\n        [string]$Arguments\r\n        )\r\n        $UserAssignedIdentityObjectId = $UserAssignedIdentityObjectId\r\n        $ContainerName = $ContainerName\r\n        $BlobName = $BlobName\r\n        $StorageAccountUrl = $StorageEndpoint\r\n        $TokenUri = \"http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=$StorageAccountUrl&object_id=$UserAssignedIdentityObjectId\"\r\n        $AccessToken = ((Invoke-WebRequest -Headers @{Metadata=$true} -Uri $TokenUri -UseBasicParsing).Content | ConvertFrom-Json).access_token\r\n        Invoke-WebRequest -Headers @{\"x-ms-version\"=\"2017-11-09\"; Authorization =\"Bearer $AccessToken\"} -Uri \"$StorageAccountUrl$ContainerName/$BlobName\" -OutFile \"$env:windir\\temp\\$Blobname\"\r\n        Start-Sleep -Seconds 60\r\n        Set-Location -Path $env:windir\\temp\r\n\r\n        # Install PowerSHell Modules\r\n        Start-Process -FilePath msiexec.exe -ArgumentList $Arguments -Wait\r\n        Get-InstalledModule | Where-Object {$_.name -like \"Az\"}\r\n      "
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('custom-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('restart-vm-{0}', parameters('deploymentNameSuffix'))]",
+      "subscriptionId": "[variables('subscriptionId')]",
+      "resourceGroup": "[parameters('managementVmRg')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "imageVmName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix'))), '2022-09-01').outputs.imageVm.value]"
+          },
+          "imageVmRg": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix'))), '2022-09-01').outputs.imageRg.value]"
+          },
+          "miName": {
+            "value": "[parameters('miName')]"
+          },
+          "miResourceGroup": {
+            "value": "[parameters('miResourceGroup')]"
+          },
+          "cloud": {
+            "value": "[variables('cloud')]"
+          },
+          "vmName": {
+            "value": "[variables('managementVmName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.20.4.51522",
+              "templateHash": "9295675734673923979"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "vmName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "miName": {
+              "type": "string"
+            },
+            "miResourceGroup": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "cloud": {
+              "type": "string"
+            },
+            "imageVmName": {
+              "type": "string"
+            },
+            "imageVmRg": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'restartVm')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "treatFailureAsDeploymentFailure": false,
+                "asyncExecution": false,
+                "parameters": [
+                  {
+                    "name": "miId",
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('miResourceGroup')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('miName')), '2023-01-31').clientId]"
+                  },
+                  {
+                    "name": "imageVmRg",
+                    "value": "[split(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('imageVmRg')), 'Microsoft.Compute/virtualMachines', parameters('imageVmName')), '/')[4]]"
+                  },
+                  {
+                    "name": "imageVmName",
+                    "value": "[parameters('imageVmName')]"
+                  },
+                  {
+                    "name": "Environment",
+                    "value": "[parameters('cloud')]"
+                  }
+                ],
+                "source": {
+                  "script": "      param(\r\n        [string]$miId,\r\n        [string]$imageVmRg,\r\n        [string]$imageVmName,\r\n        [string]$Environment\r\n        )\r\n        # Connect to Azure\r\n        Connect-AzAccount -Identity -AccountId $miId -Environment $Environment # Run on the virtual machine\r\n        # Restart VM\r\n        Restart-AzVM -Name $imageVmName -ResourceGroupName $imageVmRg\r\n\r\n        $lastProvisioningState = \"\"\r\n        $provisioningState = (Get-AzVM -resourcegroupname $imageVmRg -name $imageVmName -Status).Statuses[1].Code\r\n        $condition = ($provisioningState -eq \"PowerState/running\")\r\n        while (!$condition) {\r\n          if ($lastProvisioningState -ne $provisioningState) {\r\n            write-host $imageVmName \"under\" $imageVmRg \"is\" $provisioningState \"(waiting for state change)\"\r\n          }\r\n          $lastProvisioningState = $provisioningState\r\n\r\n          Start-Sleep -Seconds 5\r\n          $provisioningState = (Get-AzVM -resourcegroupname $imageVmRg -name $imageVmName -Status).Statuses[1].Code\r\n\r\n          $condition = ($provisioningState -eq \"PowerState/running\")\r\n        }\r\n        write-host $imageVmName \"under\" $imageVmRg \"is\" $provisioningState\r\n        start-sleep 30\r\n      "
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('custom-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('management-vm-{0}', parameters('deploymentNameSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('sysprep-vm-{0}', parameters('deploymentNameSuffix'))]",
+      "subscriptionId": "[variables('subscriptionId')]",
+      "resourceGroup": "[parameters('managementVmRg')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "vmName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix'))), '2022-09-01').outputs.imageVm.value]"
+          },
+          "containerName": {
+            "value": "[parameters('containerName')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('storageAccountName')]"
+          },
+          "storageEndpoint": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('saResourceGroup')), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').primaryEndpoints.blob]"
+          },
+          "userAssignedIdentityObjectId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('miResourceGroup')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('miName')), '2023-01-31').principalId]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.20.4.51522",
+              "templateHash": "5574413250296480838"
+            }
+          },
+          "parameters": {
+            "containerName": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageEndpoint": {
+              "type": "string"
+            },
+            "vmName": {
+              "type": "string"
+            },
+            "userAssignedIdentityObjectId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2022-11-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'sysprep')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "asyncExecution": false,
+                "parameters": [
+                  {
+                    "name": "UserAssignedIdentityObjectId",
+                    "value": "[parameters('userAssignedIdentityObjectId')]"
+                  },
+                  {
+                    "name": "StorageAccountName",
+                    "value": "[parameters('storageAccountName')]"
+                  },
+                  {
+                    "name": "ContainerName",
+                    "value": "[parameters('containerName')]"
+                  },
+                  {
+                    "name": "StorageEndpoint",
+                    "value": "[parameters('storageEndpoint')]"
+                  }
+                ],
+                "source": {
+                  "script": "    param(\r\n      [string]$UserAssignedIdentityObjectId,\r\n      [string]$StorageAccountName,\r\n      [string]$ContainerName,\r\n      [string]$StorageEndpoint\r\n      )\r\n      $UserAssignedIdentityObjectId = $UserAssignedIdentityObjectId\r\n      $StorageAccountName = $StorageAccountName\r\n      $ContainerName = $ContainerName\r\n      $BlobName = 'New-PepareVHDToUploadToAzure.ps1'\r\n      $StorageAccountUrl = $StorageEndpoint\r\n      $TokenUri = \"http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=$StorageAccountUrl&object_id=$UserAssignedIdentityObjectId\"\r\n      $AccessToken = ((Invoke-WebRequest -Headers @{Metadata=$true} -Uri $TokenUri -UseBasicParsing).Content | ConvertFrom-Json).access_token\r\n      Invoke-WebRequest -Headers @{\"x-ms-version\"=\"2017-11-09\"; Authorization =\"Bearer $AccessToken\"} -Uri \"$StorageAccountUrl$ContainerName/$BlobName\" -OutFile $env:windir\\temp\\$BlobName\r\n      Start-Sleep -Seconds 30\r\n      Set-Location -Path $env:windir\\temp\r\n      .\\New-PepareVHDToUploadToAzure.ps1\r\n      "
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('custom-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('management-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('restart-vm-{0}', parameters('deploymentNameSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('generalize-vm-{0}', parameters('deploymentNameSuffix'))]",
+      "subscriptionId": "[variables('subscriptionId')]",
+      "resourceGroup": "[parameters('managementVmRg')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "imageVmName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix'))), '2022-09-01').outputs.imageVm.value]"
+          },
+          "imageVmRg": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix'))), '2022-09-01').outputs.imageRg.value]"
+          },
+          "miName": {
+            "value": "[parameters('miName')]"
+          },
+          "miResourceGroup": {
+            "value": "[parameters('miResourceGroup')]"
+          },
+          "vmName": {
+            "value": "[variables('managementVmName')]"
+          },
+          "cloud": {
+            "value": "[variables('cloud')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.20.4.51522",
+              "templateHash": "11195340104592744482"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "vmName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "miName": {
+              "type": "string"
+            },
+            "miResourceGroup": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "cloud": {
+              "type": "string"
+            },
+            "imageVmName": {
+              "type": "string"
+            },
+            "imageVmRg": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'generalize')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "treatFailureAsDeploymentFailure": false,
+                "asyncExecution": false,
+                "parameters": [
+                  {
+                    "name": "miId",
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('miResourceGroup')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('miName')), '2023-01-31').clientId]"
+                  },
+                  {
+                    "name": "imageVmRg",
+                    "value": "[split(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('imageVmRg')), 'Microsoft.Compute/virtualMachines', parameters('imageVmName')), '/')[4]]"
+                  },
+                  {
+                    "name": "imageVmName",
+                    "value": "[parameters('imageVmName')]"
+                  },
+                  {
+                    "name": "managementVmRg",
+                    "value": "[split(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '/')[4]]"
+                  },
+                  {
+                    "name": "managementVmName",
+                    "value": "[parameters('vmName')]"
+                  },
+                  {
+                    "name": "Environment",
+                    "value": "[parameters('cloud')]"
+                  }
+                ],
+                "source": {
+                  "script": "      param(\r\n        [string]$miId,\r\n        [string]$imageVmRg,\r\n        [string]$imageVmName,\r\n        [string]$managementVmRg,\r\n        [string]$managementVmName,\r\n        [string]$Environment\r\n        )\r\n        # Connect to Azure\r\n        Connect-AzAccount -Identity -AccountId $miId -Environment $Environment # Run on the virtual machine\r\n\r\n        # Generalize VM Using PowerShell\r\n        Set-AzVm -ResourceGroupName $imageVmRg -Name $imageVmName -Generalized\r\n\r\n      "
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('custom-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('management-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('restart-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('sysprep-vm-{0}', parameters('deploymentNameSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('gallery-image-{0}', parameters('deploymentNameSuffix'))]",
+      "subscriptionId": "[variables('subscriptionId')]",
+      "resourceGroup": "[parameters('galleryResourceGroup')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "excludeFromLatest": {
+            "value": "[parameters('excludeFromLatest')]"
+          },
+          "galleryName": {
+            "value": "[parameters('galleryName')]"
+          },
+          "imageName": {
+            "value": "[parameters('imageName')]"
+          },
+          "imageVersionNumber": {
+            "value": "[parameters('imageVersion')]"
+          },
+          "imageVmId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix'))), '2022-09-01').outputs.imageId.value]"
+          },
+          "offer": {
+            "value": "[parameters('offer')]"
+          },
+          "publisher": {
+            "value": "[parameters('publisher')]"
+          },
+          "replicaCount": {
+            "value": "[parameters('replicaCount')]"
+          },
+          "sku": {
+            "value": "[parameters('sku')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.20.4.51522",
+              "templateHash": "7690822609167651738"
+            }
+          },
+          "parameters": {
+            "offer": {
+              "type": "string"
+            },
+            "publisher": {
+              "type": "string"
+            },
+            "sku": {
+              "type": "string"
+            },
+            "excludeFromLatest": {
+              "type": "bool"
+            },
+            "replicaCount": {
+              "type": "int"
+            },
+            "replicationMode": {
+              "type": "string",
+              "defaultValue": "Full"
+            },
+            "storageAccountType": {
+              "type": "string",
+              "defaultValue": "Standard_LRS"
+            },
+            "hyperVGeneration": {
+              "type": "string",
+              "defaultValue": "V2"
+            },
+            "galleryName": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "imageName": {
+              "type": "string"
+            },
+            "imageVersionNumber": {
+              "type": "string"
+            },
+            "imageVmId": {
+              "type": "string"
+            },
+            "allowDeletionOfReplicatedLocations": {
+              "type": "bool",
+              "defaultValue": true
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Compute/galleries/images",
+              "apiVersion": "2022-03-03",
+              "name": "[format('{0}/{1}', parameters('galleryName'), parameters('imageName'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "architecture": "x64",
+                "features": [
+                  {
+                    "name": "IsHibernateSupported",
+                    "value": "True"
+                  },
+                  {
+                    "name": "IsAcceleratedNetworkSupported",
+                    "value": "True"
+                  },
+                  {
+                    "name": "SecurityType",
+                    "value": "TrustedLaunch"
+                  }
+                ],
+                "hyperVGeneration": "[parameters('hyperVGeneration')]",
+                "identifier": {
+                  "offer": "[parameters('offer')]",
+                  "publisher": "[parameters('publisher')]",
+                  "sku": "[parameters('sku')]"
+                },
+                "osState": "Generalized",
+                "osType": "Windows"
+              }
+            },
+            {
+              "type": "Microsoft.Compute/galleries/images/versions",
+              "apiVersion": "2022-03-03",
+              "name": "[format('{0}/{1}/{2}', parameters('galleryName'), parameters('imageName'), parameters('imageVersionNumber'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "publishingProfile": {
+                  "excludeFromLatest": "[parameters('excludeFromLatest')]",
+                  "replicaCount": "[parameters('replicaCount')]",
+                  "replicationMode": "[parameters('replicationMode')]",
+                  "storageAccountType": "[parameters('storageAccountType')]",
+                  "targetRegions": [
+                    {
+                      "excludeFromLatest": "[parameters('excludeFromLatest')]",
+                      "name": "[parameters('location')]",
+                      "regionalReplicaCount": "[parameters('replicaCount')]",
+                      "storageAccountType": "[parameters('storageAccountType')]"
+                    }
+                  ]
+                },
+                "safetyProfile": {
+                  "allowDeletionOfReplicatedLocations": "[parameters('allowDeletionOfReplicatedLocations')]"
+                },
+                "storageProfile": {
+                  "source": {
+                    "id": "[parameters('imageVmId')]"
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', parameters('galleryName'), parameters('imageName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('custom-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('generalize-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('management-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('restart-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('sysprep-vm-{0}', parameters('deploymentNameSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('remove-vm-{0}', parameters('deploymentNameSuffix'))]",
+      "subscriptionId": "[variables('subscriptionId')]",
+      "resourceGroup": "[parameters('managementVmRg')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "imageVmName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix'))), '2022-09-01').outputs.imageVm.value]"
+          },
+          "imageVmRg": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix'))), '2022-09-01').outputs.imageRg.value]"
+          },
+          "miName": {
+            "value": "[parameters('miName')]"
+          },
+          "miResourceGroup": {
+            "value": "[parameters('miResourceGroup')]"
+          },
+          "cloud": {
+            "value": "[variables('cloud')]"
+          },
+          "vmName": {
+            "value": "[variables('managementVmName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.20.4.51522",
+              "templateHash": "15292980979494363469"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "vmName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "miName": {
+              "type": "string"
+            },
+            "miResourceGroup": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "cloud": {
+              "type": "string"
+            },
+            "imageVmName": {
+              "type": "string"
+            },
+            "imageVmRg": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'removeVm')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "treatFailureAsDeploymentFailure": false,
+                "asyncExecution": true,
+                "parameters": [
+                  {
+                    "name": "miId",
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('miResourceGroup')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('miName')), '2023-01-31').clientId]"
+                  },
+                  {
+                    "name": "imageVmRg",
+                    "value": "[split(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('imageVmRg')), 'Microsoft.Compute/virtualMachines', parameters('imageVmName')), '/')[4]]"
+                  },
+                  {
+                    "name": "imageVmName",
+                    "value": "[parameters('imageVmName')]"
+                  },
+                  {
+                    "name": "managementVmRg",
+                    "value": "[split(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '/')[4]]"
+                  },
+                  {
+                    "name": "managementVmName",
+                    "value": "[parameters('vmName')]"
+                  },
+                  {
+                    "name": "Environment",
+                    "value": "[parameters('cloud')]"
+                  }
+                ],
+                "source": {
+                  "script": "      param(\r\n        [string]$miId,\r\n        [string]$imageVmRg,\r\n        [string]$imageVmName,\r\n        [string]$managementVmRg,\r\n        [string]$managementVmName,\r\n        [string]$Environment\r\n        )\r\n        # Connect to Azure\r\n        Connect-AzAccount -Identity -AccountId $miId -Environment $Environment # Run on the virtual machine\r\n\r\n        # Remove Image VM and Management VM\r\n\r\n        Remove-AzVM -Name $imageVmName -ResourceGroupName $imageVmRg -Nowait -ForceDeletion $true -Force\r\n\r\n        start-sleep 60\r\n\r\n        Remove-AzVM -Name $managementVmName -ResourceGroupName $managementVmRg -NoWait -ForceDeletion $true -Force -AsJob\r\n      "
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('custom-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('generalize-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('galleryResourceGroup')), 'Microsoft.Resources/deployments', format('gallery-image-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('imageVmRg')), 'Microsoft.Resources/deployments', format('image-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('management-vm-{0}', parameters('deploymentNameSuffix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('subscriptionId'), parameters('managementVmRg')), 'Microsoft.Resources/deployments', format('sysprep-vm-{0}', parameters('deploymentNameSuffix')))]"
+      ]
+    }
+  ]
+}
